@@ -3,16 +3,32 @@ class Boat {
 
   get formattedColor(): string {
     return `This boat's color is ${this.color}`
-  }
+  };
 
-  @logError
+  @logError('Oops, boat was sunk in the ocean')
   pilot(): void {
     throw new Error();
     console.log('swish');
-  }
+  };
+};
+
+function testDecorator(target: any, key: string) {
+  console.log(target);
+  console.log(key);
 }
 
-function logError(target: any, key: string, desc: PropertyDescriptor) {
-  console.log('Target:', target);
-  console.log('Key:', key); 
-}
+function logError(errorMessage: string) {
+  return function (target: any, key: string, desc: PropertyDescriptor) {
+    const method = desc.value;
+
+    desc.value = function() {
+      try { 
+        method();
+      } catch (e) {
+        console.log(errorMessage);
+      };
+    };
+  };
+};
+
+new Boat().pilot
