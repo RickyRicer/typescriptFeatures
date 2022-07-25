@@ -13,25 +13,26 @@ import 'reflect-metadata'
 // console.log(note);
 // console.log(height);
 
-@printMetadata
+@controller
 class Plane {
   color: string = 'red';
 
-  @markFunction('HI THERE')
+  @get('HI THERE')
   fly(): void {
     console.log('vrrrrr');
   }
 }
 
-function markFunction(secretInfo: string) {
+function get(path: string) {
   return function (target: Plane, key: string) {
-    Reflect.defineMetadata('secret', secretInfo, target, key);
+    Reflect.defineMetadata('path', path, target, key);
   }
 }
 
-function printMetadata(target: typeof Plane) {
+function controller(target: typeof Plane) {
   for (let key in target.prototype) {
-    const secret = Reflect.getMetadata('secret', target.prototype, key);
-    console.log(secret);
+    const path = Reflect.getMetadata('secret', target.prototype, key);
+    
+    router.get(path, target.prototype[key]);
   }
 }
